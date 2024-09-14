@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+indent() {
+    sed -u 's/^/      /'
+}
+
+BUILD_DIR="$1"
+CACHE_DIR="$2" # not used in this script, can remove it?
+ENV_DIR="$3"
+
+if [ ! -f "${ENV_DIR}/IGNORE_DEPENDENCIES" ]; then
+    echo "IGNORE_DEPENDENCIES was not set. Aborting" | indent
+    exit 1
+fi
+
+(
+    if [ ! -z "$IGNORE_DEPENDENCIES" ]; then
+        echo "Processing dependencies to remove" | indent
+        for DEPENDENCY in ${IGNORE_DEPENDENCIES}; do
+            if [ ! -d "${BUILD_DIR}/${DEPENDENCY}" ]; then
+                echo "Dependency ${DEPENDENCY} not found. Aborting" | indent
+                exit 1
+            fi
+            echo "Removing dependency ${DEPENDENCY} from '${BUILD_DIR}/${DEPENDENCY}'." | indent | indent
+            rm -rf "${BUILD_DIR}/${DEPENDENCY}"
+        done
+    fi
+)
+
+if [ $? -ne 0 ]; then
+    echo "FAILED to remove dependencies ${IGNORE_DEPENDENCIES}" | indent
+    exit 1
+fi
+
+echo "Removed dependencies ${IGNORE_DEPENDENCIES} from app successfully" | indent

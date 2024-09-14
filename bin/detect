@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "Ignore dependencies monorepo"
+exit 0
